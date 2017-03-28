@@ -22,3 +22,12 @@ _testmain.go
 *.exe
 *.test
 *.prof
+
+# emacs
+\#*
+*.*~
+
+debug
+hid-compiler
+
+.vscode
