@@ -9,6 +9,7 @@ import (
 var stringModifierRe = regexp.MustCompile(`((\[(LSHIFT|LCTRL|LALT|LMETA|RSHIFT|RCTRL|RALT|RMETA)\]>)+(\w+))+`)
 var charModifierRe = regexp.MustCompile(`((\w+)+(\[(LSHIFT|LCTRL|LALT|LMETA|RSHIFT|RCTRL|RALT|RMETA)\]:)+(\w+))+`)
 
+// Compile actually builds the scancode sequence
 func Compile(s string) string {
 	l := newLinkedList()
 
