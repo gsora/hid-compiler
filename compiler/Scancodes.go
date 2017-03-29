@@ -55,7 +55,7 @@ var scancodes = map[string]string{
 	"ESC":                "0x29",
 	"BACKSPACE":          "0x2a",
 	"TAB":                "0x2b",
-	"SPACE":              "0x2c",
+	" ":                  "0x2c",
 	"MINUS":              "0x2d",
 	"EQUAL":              "0x2e",
 	"LEFTBRACE":          "0x2f",
