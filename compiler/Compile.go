@@ -1,9 +1,7 @@
 package compiler
 
 import (
-	"github.com/gsora/hid-compiler/linkedlist"
-	"github.com/gsora/hid-compiler/modifiers"
-	"github.com/gsora/hid-compiler/types"
+	"bytes"
 	"regexp"
 	"strings"
 )
@@ -11,17 +9,31 @@ import (
 var stringModifierRe = regexp.MustCompile(`((\[(LSHIFT|LCTRL|LALT|LMETA|RSHIFT|RCTRL|RALT|RMETA)\]>)+(\w+))+`)
 var charModifierRe = regexp.MustCompile(`((\w+)+(\[(LSHIFT|LCTRL|LALT|LMETA|RSHIFT|RCTRL|RALT|RMETA)\]:)+(\w+))+`)
 
-func Compile(s string) linkedlist.LinkedList {
-	l := linkedlist.NewLinkedList()
+func Compile(s string) string {
+	l := newLinkedList()
 
 	for _, word := range strings.Split(s, " ") {
-		l.InsertToken(tokenize(word))
+		l.insertToken(tokenize(word))
 	}
 
-	return l
+	node := l.getFirst()
+	var buf bytes.Buffer
+	for node.Next != nil {
+		d := node.Data
+		if d.StringModifier.Modifier != NOMOD {
+			buf.WriteString(generateHIDPayloadForString(d.StringModifier))
+		} else if d.CharacterModifier.Modifier != NOMOD {
+			buf.WriteString(generateHIDPayloadForCharacter(d.CharacterModifier))
+		} else {
+			buf.WriteString(generateHIDPayloadForStandardString(d.RealString))
+		}
+		node = *node.Next
+	}
+
+	return buf.String()
 }
 
-func tokenize(s string) types.Token {
+func tokenize(s string) token {
 	if matchStringModifier(s) {
 		return tokenizeStringModifier(s)
 	}
@@ -30,11 +42,11 @@ func tokenize(s string) types.Token {
 		return tokenizeCharModifier(s)
 	}
 
-	return types.Token{
+	return token{
 		RawString:         s,
 		RealString:        s,
-		StringModifier:    modifiers.StringModifier{StringRef: "", Modifier: modifiers.NOMOD},
-		CharacterModifier: modifiers.CharacterModifier{CharRef: ' ', Modifier: modifiers.NOMOD},
+		StringModifier:    stringModifier{StringRef: "", Modifier: NOMOD},
+		CharacterModifier: characterModifier{CharRef: ' ', Modifier: NOMOD},
 	}
 }
 
@@ -46,68 +58,68 @@ func matchCharModifier(s string) bool {
 	return charModifierRe.MatchString(s)
 }
 
-func tokenizeCharModifier(s string) types.Token {
-	t := types.Token{}
+func tokenizeCharModifier(s string) token {
+	t := token{}
 
 	submatch := charModifierRe.FindStringSubmatch(s)
 	t.RawString = s
 	t.RealString = submatch[2] + submatch[5]
 
-	var m modifiers.Modifier
+	var m modifier
 	switch submatch[4] {
 	case "LCTRL":
-		m = modifiers.LCTRL
+		m = LCTRL
 	case "LSHIFT":
-		m = modifiers.LSHIFT
+		m = LSHIFT
 	case "LALT":
-		m = modifiers.LALT
+		m = LALT
 	case "LMETA":
-		m = modifiers.LMETA
+		m = LMETA
 	case "RCTRL":
-		m = modifiers.RCTRL
+		m = RCTRL
 	case "RSHIFT":
-		m = modifiers.RSHIFT
+		m = RSHIFT
 	case "RALT":
-		m = modifiers.RALT
+		m = RALT
 	case "RMETA":
-		m = modifiers.RMETA
+		m = RMETA
 	}
 
-	t.CharacterModifier = modifiers.CharacterModifier{CharRef: submatch[5][0], Modifier: m, Left: submatch[2], Right: submatch[5]}
-	t.StringModifier = modifiers.StringModifier{StringRef: "", Modifier: modifiers.NOMOD}
+	t.CharacterModifier = characterModifier{CharRef: submatch[5][0], Modifier: m, Left: submatch[2], Right: submatch[5]}
+	t.StringModifier = stringModifier{StringRef: "", Modifier: NOMOD}
 
 	return t
 }
 
-func tokenizeStringModifier(s string) types.Token {
-	t := types.Token{}
+func tokenizeStringModifier(s string) token {
+	t := token{}
 
 	submatch := stringModifierRe.FindStringSubmatch(s)
 	t.RawString = s
 	t.RealString = submatch[4]
 
-	var m modifiers.Modifier
+	var m modifier
 	switch submatch[3] {
 	case "LCTRL":
-		m = modifiers.LCTRL
+		m = LCTRL
 	case "LSHIFT":
-		m = modifiers.LSHIFT
+		m = LSHIFT
 	case "LALT":
-		m = modifiers.LALT
+		m = LALT
 	case "LMETA":
-		m = modifiers.LMETA
+		m = LMETA
 	case "RCTRL":
-		m = modifiers.RCTRL
+		m = RCTRL
 	case "RSHIFT":
-		m = modifiers.RSHIFT
+		m = RSHIFT
 	case "RALT":
-		m = modifiers.RALT
+		m = RALT
 	case "RMETA":
-		m = modifiers.RMETA
+		m = RMETA
 	}
 
-	t.StringModifier = modifiers.StringModifier{StringRef: submatch[4], Modifier: m}
-	t.CharacterModifier = modifiers.CharacterModifier{CharRef: ' ', Modifier: modifiers.NOMOD}
+	t.StringModifier = stringModifier{StringRef: submatch[4], Modifier: m}
+	t.CharacterModifier = characterModifier{CharRef: ' ', Modifier: NOMOD}
 
 	return t
 }
