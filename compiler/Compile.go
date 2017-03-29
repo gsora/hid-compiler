@@ -27,6 +27,10 @@ func Compile(s string) string {
 		} else {
 			buf.WriteString(generateHIDPayloadForStandardString(d.RealString))
 		}
+
+		if node.Next != nil {
+			buf.WriteString(generateHIDPayloadForSpace())
+		}
 		node = *node.Next
 	}
 
