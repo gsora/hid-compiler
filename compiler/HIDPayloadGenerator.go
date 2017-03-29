@@ -24,10 +24,12 @@ func generateHIDPayloadForString(s stringModifier) string {
 	var ret bytes.Buffer
 
 	for count, character := range s.StringRef {
-		st := hidPayload{s.Modifier, scancodeForModifier(strings.ToUpper(string(character)))}
-		ret.WriteString(st.String())
-		if count != len(s.StringRef) {
-			ret.WriteString(hidEmpty)
+		if string(character) != "\n" {
+			st := hidPayload{s.Modifier, scancodeForModifier(strings.ToUpper(string(character)))}
+			ret.WriteString(st.String())
+			if count != len(s.StringRef) {
+				ret.WriteString(hidEmpty)
+			}
 		}
 	}
 
@@ -54,10 +56,12 @@ func generateHIDPayloadForStandardString(s string) string {
 	var ret bytes.Buffer
 
 	for count, character := range s {
-		st := hidPayload{NOMOD, scancodeForModifier(strings.ToUpper(string(character)))}
-		ret.WriteString(st.String())
-		if count != len(s) {
-			ret.WriteString(hidEmpty)
+		if string(character) != "\n" {
+			st := hidPayload{NOMOD, scancodeForModifier(strings.ToUpper(string(character)))}
+			ret.WriteString(st.String())
+			if count != len(s) {
+				ret.WriteString(hidEmpty)
+			}
 		}
 	}
 

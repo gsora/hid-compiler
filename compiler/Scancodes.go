@@ -1,7 +1,14 @@
 package compiler
 
+import "log"
+
 func scancodeForModifier(m string) string {
-	return scancodes[m][2:]
+	if val, ok := scancodes[m]; ok {
+		return val[2:]
+	} else {
+		log.Fatal("NOT FOUND:", m == "\n")
+		return " "
+	}
 }
 
 var scancodes = map[string]string{
@@ -62,8 +69,8 @@ var scancodes = map[string]string{
 	"RIGHTBRACE":         "0x30",
 	"BACKSLASH":          "0x31",
 	"HASHTILDE":          "0x32",
-	"SEMICOLON":          "0x33",
-	"APOSTROPHE":         "0x34",
+	";":                  "0x33",
+	"'":                  "0x34",
 	"GRAVE":              "0x35",
 	",":                  "0x36",
 	".":                  "0x37",
