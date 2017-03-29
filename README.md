@@ -62,3 +62,50 @@ ST[key-modifier]:RING
 ```
 
 The modifier operation will be applied on the "R" character of the "STRING" ASCII string.
+
+## Intuitive idea and compiling phases
+
+The input string is parsed as a *linked list* composed of `tokens`.
+
+A `token` holds the original, un-parsed string, the parsed string without any modifier, either a `stringModifier` or a `characterModifier`.
+
+Both `stringModifier` and `characterModifier` holds a reference to the string or character they have to modify, and a `modifier`.
+
+A `modifier` is a simple data type, mostly created for stylish purposes -- I could have used a simple `int`, but that would have been ugly.
+
+
+While a `stringModifier` is conceptually easier to understand -- it only holds a string and a `modifier` -- `characterModifier` is more complex because of the way it binds to a character.
+
+This kind of modifier can appear everywhere in the string, thus I needed to memorize the sub-string before the modifier (`Left`) and after (`Right`), including the character to modify.
+
+The real action starts in the `Compile(s string)`, in `compiler/Compile.go`.
+
+This function starts by creating a linked list; each word divided a space will be tokenized by `tokenize(s string)` and put into the list.
+
+`tokenize(s string)` calls both `matchStringModifier(s string)` and `matchCharModifier(s string)` to check if the string contains a character modifier, or a string modifier.
+
+Each of these function will return a `token` containig one of the two modifier fields non-nil.
+
+If both functions don't return, it means the string doesn't contain any modifier, and thus can be parsed withouth any special operation-- the resulting `token` contains the modifier fields set to `nil`.
+
+After the tokenizing phase, it's now time to actually translate the tokens to HID scancodes.
+
+Since there are 3 types of strings currently built in, 3 functions has been written to accomplish the translation:
+
+ + `generateHIDPayloadForString(s stringModifier)`
+ + `generateHIDPayloadForCharacter(c characterModifier)`
+ + `generateHIDPayloadForCharacter(s string)`
+ + `generateHIDPayloadForSpace()`
+ 
+To make the translation easier, the `hidPayload` type has been defined.
+`hidPayload` holds a reference to the Modifier to apply to a character (which is a `string` anyway), and the character itself.
+
+A `String()` method for `hidPayload` has been defined too, which returns the hex-formatted scancode.
+
+In a nutshell, these function will create the hex-formatted string by concatenating the `String()` output of all the `hidPayload` created with the content of the `characterModifier` or `stringModifier` (if any) passed as argument.
+
+`generateHIDPayloadForCharacter(c characterModifier)` is a little bit different, because it has to account for the left and right part of the original string.
+
+`generateHIDPayloadForSpace()` is much simpler: it just creates a "space" character, encoded.
+
+These functions will be called while cycling through the list, and their output will be concatenated.
