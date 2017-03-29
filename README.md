@@ -1,3 +1,16 @@
+# `hid-compiler` [![Go Report Card](https://goreportcard.com/badge/github.com/gsora/hid-compiler)](https://goreportcard.com/report/github.com/gsora/hid-compiler)
+
+An experimental "compiler".
+Write and compile a small language to Linux's USB HID keyboard scancodes.
+
+## Why
+
+Sometimes, you need a quick solution to write USB HID scancodes, and the process **will** be painful.
+
+Why write scancodes by hand when you can create a small language and a compiler to do this job for you instead? `;)`
+
+I'm not a compiler designer, or a language designer, I'm just a guy who likes to tinker with stuff -- I know this is far from being called a real compiler.
+
 ## Syntax
 
 `hid-compiler` will accept any **ASCII symbol**.
