@@ -71,10 +71,10 @@ A `token` holds the original, un-parsed string, the parsed string without any mo
 
 Both `stringModifier` and `characterModifier` holds a reference to the string or character they have to modify, and a `modifier`.
 
-A `modifier` is a simple data type, mostly created for stylish purposes -- I could have used a simple `int`, but that would have been ugly.
+A `modifier` is a simple data type, mostly created for stylish purposes - I could have used a simple `int`, but that would have been ugly.
 
 
-While a `stringModifier` is conceptually easier to understand -- it only holds a string and a `modifier` -- `characterModifier` is more complex because of the way it binds to a character.
+While a `stringModifier` is conceptually easier to understand - it only holds a string and a `modifier` - `characterModifier` is more complex because of the way it binds to a character.
 
 This kind of modifier can appear everywhere in the string, thus I needed to memorize the sub-string before the modifier (`Left`) and after (`Right`), including the character to modify.
 
@@ -86,7 +86,7 @@ This function starts by creating a linked list; each word divided a space will b
 
 Each of these function will return a `token` containig one of the two modifier fields non-nil.
 
-If both functions don't return, it means the string doesn't contain any modifier, and thus can be parsed withouth any special operation-- the resulting `token` contains the modifier fields set to `nil`.
+If both functions don't return, it means the string doesn't contain any modifier, and thus can be parsed withouth any special operation - the resulting `token` contains the modifier fields set to `nil`.
 
 After the tokenizing phase, it's now time to actually translate the tokens to HID scancodes.
 
