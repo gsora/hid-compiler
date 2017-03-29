@@ -64,3 +64,7 @@ func generateHIDPayloadForStandardString(s string) string {
 	return ret.String()
 
 }
+
+func generateHIDPayloadForSpace() string {
+	return generateHIDPayloadForStandardString(" ")
+}
