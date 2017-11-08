@@ -11,13 +11,13 @@ type hidPayload struct {
 	Character0 string
 }
 
-const hidEmpty = "\\0\\0\\0\\0\\0\\0\\0\\0"
+const hidEmpty = "\x00\x00\x00\x00\x00\x00\x00\x00"
 
 func (h *hidPayload) String() string {
 	if h.Modifier == NOMOD {
-		return fmt.Sprintf("\\0\\0\\%s\\0\\0\\0\\0\\0", h.Character0)
+		return fmt.Sprintf("\x00\x00%s\x00\x00\x00\x00\x00", h.Character0)
 	}
-	return fmt.Sprintf("\\%s\\0\\%s\\0\\0\\0\\0\\0", scancodeForModifier(h.Modifier.String()), h.Character0)
+	return fmt.Sprintf("%s\x00%s\x00\x00\x00\x00\x00", scancodeForModifier(h.Modifier.String()), h.Character0)
 }
 
 func generateHIDPayloadForString(s stringModifier) string {

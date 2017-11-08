@@ -38,6 +38,36 @@ func Compile(s string) string {
 	return buf.String()
 }
 
+// compile a string into a array of string
+func CompileArray(s string) []string {
+	l := newLinkedList()
+	sa := []string{}
+
+	for _, word := range strings.Split(s, " ") {
+		l.insertToken(tokenize(word))
+	}
+
+	node := l.getFirst()
+
+	for node.Next != nil {
+		d := node.Data
+		if d.StringModifier.Modifier != NOMOD {
+			sa = append(sa, generateHIDPayloadForString(d.StringModifier))
+		} else if d.CharacterModifier.Modifier != NOMOD {
+			sa = append(sa, generateHIDPayloadForCharacter(d.CharacterModifier))
+		} else {
+			sa = append(sa, generateHIDPayloadForStandardString(d.RealString))
+		}
+
+		if node.Next != nil {
+			sa = append(sa, generateHIDPayloadForSpace())
+		}
+		node = *node.Next
+	}
+
+	return sa
+}
+
 func tokenize(s string) token {
 	if matchStringModifier(s) {
 		return tokenizeStringModifier(s)
